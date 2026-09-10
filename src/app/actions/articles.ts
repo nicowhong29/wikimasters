@@ -108,7 +108,17 @@ export async function deleteArticleForm(
     return { success: false, message: "Missing article id." };
   }
 
-  const result = await deleteArticle(id);
+  let result: Awaited<ReturnType<typeof deleteArticle>>;
+  try {
+    result = await deleteArticle(id);
+  } catch (error) {
+    console.error("Delete article failed:", error);
+    return {
+      success: false,
+      message: "The article could not be deleted. Please try again.",
+    };
+  }
+
   if (!result.success) {
     return result;
   }
