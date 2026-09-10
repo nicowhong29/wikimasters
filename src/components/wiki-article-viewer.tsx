@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useActionState, useEffect, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import {
@@ -21,7 +22,6 @@ import { incrementPageview } from "@/app/actions/pageviews";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { useRouter } from "next/navigation";
 
 interface ViewerArticle {
   title: string;
@@ -41,8 +41,8 @@ export default function WikiArticleViewer({
   article,
   canEdit = false,
 }: WikiArticleViewerProps) {
-  const router = useRouter();
   const [localPageviews, setLocalPageviews] = useState(0);
+  const router = useRouter();
   const [deleteState, deleteAction, isDeleting] = useActionState<
     DeleteArticleState,
     FormData
@@ -70,7 +70,6 @@ export default function WikiArticleViewer({
   useEffect(() => {
     if (deleteState?.success) {
       router.push("/");
-      router.refresh();
     }
   }, [deleteState, router]);
 

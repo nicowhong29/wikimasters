@@ -121,5 +121,5 @@ export async function deleteArticleForm(
     };
   }
 
-  return { success: true, message: "Article deleted successfully." };
+  redirect("/");
 }

@@ -104,6 +104,7 @@ export default function WikiEditor({
       } else {
         await createArticle(payload);
         alert("Article created (stub)");
+        router.push("/");
       }
     } catch (err) {
       console.error("Error submitting article:", err);
@@ -275,13 +276,14 @@ export default function WikiEditor({
                 variant="outline"
                 onClick={handleCancel}
                 disabled={isSubmitting}
+                className="cursor-pointer"
               >
                 Cancel
               </Button>
               <Button
                 type="submit"
                 disabled={isSubmitting}
-                className="min-w-[100px]"
+                className="min-w-[100px] cursor-pointer"
               >
                 {isSubmitting ? "Saving..." : "Save Article"}
               </Button>
