@@ -2,6 +2,7 @@
 
 import MDEditor from "@uiw/react-md-editor";
 import { Upload, X } from "lucide-react";
+import { useRouter } from "next/navigation";
 import type React from "react";
 import { useState } from "react";
 import { createArticle, updateArticle } from "@/app/actions/articles";
@@ -34,6 +35,7 @@ export default function WikiEditor({
   const [files, setFiles] = useState<File[]>([]);
   const [errors, setErrors] = useState<FormErrors>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const router = useRouter();
 
   // Validate form
   const validateForm = (): boolean => {
@@ -96,6 +98,9 @@ export default function WikiEditor({
       if (isEditing && articleId) {
         const result = await updateArticle(articleId, payload);
         alert(result.success ? "Article updated (stub)" : result.message);
+        if (result.success) {
+          router.push(`/wiki/${articleId}`);
+        }
       } else {
         await createArticle(payload);
         alert("Article created (stub)");
