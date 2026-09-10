@@ -94,8 +94,8 @@ export default function WikiEditor({
       };
 
       if (isEditing && articleId) {
-        await updateArticle(articleId, payload);
-        alert("Article updated (stub)");
+        const result = await updateArticle(articleId, payload);
+        alert(result.success ? "Article updated (stub)" : result.message);
       } else {
         await createArticle(payload);
         alert("Article created (stub)");

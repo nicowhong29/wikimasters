@@ -25,6 +25,11 @@ export type UpdateArticleInput = {
   imageUrl?: string;
 };
 
+export type DeleteArticleState = {
+  success: boolean;
+  message: string;
+} | null;
+
 export async function createArticle(data: CreateArticleInput) {
   const user = await stackServerApp.getUser();
   if (!user) {
@@ -53,7 +58,10 @@ export async function updateArticle(id: string, data: UpdateArticleInput) {
   }
 
   if (!(await authorizeUserToEditArticle(user.id, +id))) {
-    throw new Error("Forbidden");
+    return {
+      success: false,
+      message: "You are not the owner of this article.",
+    };
   }
 
   // TODO: Replace with actual database update
@@ -78,24 +86,33 @@ export async function deleteArticle(id: string) {
   }
 
   if (!(await authorizeUserToEditArticle(user.id, +id))) {
-    throw new Error("Forbidden");
+    return {
+      success: false,
+      message: "You are not the owner of this article.",
+    };
   }
 
-  // TODO: Replace with actual database delete
-  console.log("🗑️ deleteArticle called:", id);
-
   await db.delete(articles).where(eq(articles.id, +id));
-  return { success: true, message: `Article ${id} delete logged (stub)` };
+  await redis.del("articles:all");
+
+  return { success: true, message: `Article ${id} deleted` };
 }
 
 // Form-friendly server action: accepts FormData from a client form and calls deleteArticle
-export async function deleteArticleForm(formData: FormData): Promise<void> {
+export async function deleteArticleForm(
+  _previousState: DeleteArticleState,
+  formData: FormData,
+): Promise<DeleteArticleState> {
   const id = formData.get("id");
-  if (!id) {
-    throw new Error("Missing article id");
+  if (typeof id !== "string" || !/^\d+$/.test(id)) {
+    return { success: false, message: "Missing article id." };
   }
 
-  await deleteArticle(String(id));
+  const result = await deleteArticle(id);
+  if (!result.success) {
+    return result;
+  }
+
   // After deleting, redirect the user back to the homepage.
   redirect("/");
 }

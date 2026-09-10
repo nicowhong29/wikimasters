@@ -11,9 +11,12 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useActionState, useEffect, useState } from "react";
 import ReactMarkdown from "react-markdown";
-import { deleteArticleForm } from "@/app/actions/articles";
+import {
+  type DeleteArticleState,
+  deleteArticleForm,
+} from "@/app/actions/articles";
 import { incrementPageview } from "@/app/actions/pageviews";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -38,6 +41,10 @@ export default function WikiArticleViewer({
   canEdit = false,
 }: WikiArticleViewerProps) {
   const [localPageviews, setLocalPageviews] = useState(0);
+  const [deleteState, deleteAction, isDeleting] = useActionState<
+    DeleteArticleState,
+    FormData
+  >(deleteArticleForm, null);
 
   // Format date for display
   const formatDate = (dateString: string) => {
@@ -110,20 +117,27 @@ export default function WikiArticleViewer({
             </Link>
 
             {/* Delete form calls the server action wrapper */}
-            <form action={deleteArticleForm}>
+            <form action={deleteAction}>
               <input type="hidden" name="id" value={String(article.id)} />
               <Button
                 type="submit"
                 variant="destructive"
                 className="ml-2 cursor-pointer"
+                disabled={isDeleting}
               >
                 <Trash className="h-4 w-4 mr-2" />
-                Delete
+                {isDeleting ? "Deleting..." : "Delete"}
               </Button>
             </form>
           </div>
         )}
       </div>
+
+      {deleteState && !deleteState.success && (
+        <p className="mb-6 text-sm font-medium text-destructive" role="alert">
+          {deleteState.message}
+        </p>
+      )}
 
       {/* Article Content */}
       <Card>
@@ -253,15 +267,16 @@ export default function WikiArticleViewer({
               </Button>
             </Link>
 
-            <form action={deleteArticleForm}>
+            <form action={deleteAction}>
               <input type="hidden" name="id" value={String(article.id)} />
               <Button
                 type="submit"
                 variant="destructive"
                 className="cursor-pointer"
+                disabled={isDeleting}
               >
                 <Trash className="h-4 w-4 mr-2" />
-                Delete
+                {isDeleting ? "Deleting..." : "Delete"}
               </Button>
             </form>
           </div>
