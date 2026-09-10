@@ -108,9 +108,11 @@ export async function deleteArticleForm(
     return { success: false, message: "Missing article id." };
   }
 
-  let result: Awaited<ReturnType<typeof deleteArticle>>;
   try {
-    result = await deleteArticle(id);
+    const result = await deleteArticle(id);
+    if (!result.success) {
+      return result;
+    }
   } catch (error) {
     console.error("Delete article failed:", error);
     return {
@@ -119,10 +121,5 @@ export async function deleteArticleForm(
     };
   }
 
-  if (!result.success) {
-    return result;
-  }
-
-  // After deleting, redirect the user back to the homepage.
-  redirect("/");
+  return { success: true, message: "Article deleted successfully." };
 }

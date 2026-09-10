@@ -21,6 +21,7 @@ import { incrementPageview } from "@/app/actions/pageviews";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { useRouter } from "next/router";
 
 interface ViewerArticle {
   title: string;
@@ -40,6 +41,7 @@ export default function WikiArticleViewer({
   article,
   canEdit = false,
 }: WikiArticleViewerProps) {
+  const router = useRouter();
   const [localPageviews, setLocalPageviews] = useState(0);
   const [deleteState, deleteAction, isDeleting] = useActionState<
     DeleteArticleState,
@@ -64,6 +66,13 @@ export default function WikiArticleViewer({
 
     fetchPageview();
   }, [article.id]);
+
+  useEffect(() => {
+    if (deleteState?.success) {
+      router.push("/");
+      router.reload();
+    }
+  }, [deleteState, router]);
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-4xl">
