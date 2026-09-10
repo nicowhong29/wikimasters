@@ -21,7 +21,7 @@ import { incrementPageview } from "@/app/actions/pageviews";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 
 interface ViewerArticle {
   title: string;
@@ -70,7 +70,7 @@ export default function WikiArticleViewer({
   useEffect(() => {
     if (deleteState?.success) {
       router.push("/");
-      router.reload();
+      router.refresh();
     }
   }, [deleteState, router]);
 
